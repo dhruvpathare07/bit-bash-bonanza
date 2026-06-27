@@ -59,7 +59,7 @@ Bit Bash Bonanza is an interactive coding game designed to test and improve prog
 
 ```bash
 git clone https://github.com/dhruvpathare07/bit-bash-bonanza.git
-cd bit-bash-bonanza
+cd bit-bash-bonanza\frontend\bit-bash-frontend
 ```
 
 ---
@@ -76,7 +76,8 @@ npm run dev
 ## 🐍 Backend Setup
 
 ```bash
-python runner.py
+cd bit-bash-bonanza\backend
+python app.py
 ```
 
 ---
