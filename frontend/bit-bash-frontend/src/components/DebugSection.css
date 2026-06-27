@@ -43,7 +43,7 @@
 }
 
 .avatar {
-  font-size: 50px;
+  font-size: 20px;
   animation: avatarPulse 6s ease-in-out infinite;
 }
 

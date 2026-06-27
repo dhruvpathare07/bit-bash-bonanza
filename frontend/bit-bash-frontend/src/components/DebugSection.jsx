@@ -100,7 +100,8 @@ const updateScore = (delta) => {
     const data = await res.json();
     setResult(data);
 
-    const newProgress = data.progress ?? 0;
+    const newProgress = Number(data.progress) || 0;
+
 
     setProgress(newProgress);
 
@@ -279,7 +280,7 @@ const updateScore = (delta) => {
 
         <button
           className="restart-btn"
-          onClick={onSuccess}
+          onClick={() => onSuccess(progress)}
         >
           Move to Next Question
         </button>

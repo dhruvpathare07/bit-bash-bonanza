@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef } from "react";
 import TopicSwiper from "../../components/TopicSwiper";
 import CodeAssembler from "../../components/CodeAssembler";
 import TopicRevealCard from "../../components/TopicRevealCard";
@@ -9,11 +9,9 @@ import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";
 import "../question.css";
 import { C_EXPECTED_OUTPUT } from "../../data/cExpectedOutput";
-import { initProgress, getProgress } from "../../utils/progress";
-import { completeQuestion } from "../../utils/progress";
+import { initProgress, getProgress, completeQuestion } from "../../utils/progress";
 
 export default function Question_1() {
-  // GAME STATE
   const [phase, setPhase] = useState("wheel");
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [isGameOver, setIsGameOver] = useState(false);
@@ -22,13 +20,14 @@ export default function Question_1() {
   const playerProfile = JSON.parse(sessionStorage.getItem("playerProfile")) || {};
   const [isLocked, setIsLocked] = useState(false);
 
-  const getGameSession = () =>
-    JSON.parse(sessionStorage.getItem("gameSession"));
+  const [assemblyScore, setAssemblyScore] = useState(0);
+  const [debugScore, setDebugScore] = useState(0);
+  const [timeBonus, setTimeBonus] = useState(0);
+  const [currentTimeLeft, setCurrentTimeLeft] = useState(600);
 
-  const [score, setScore] = useState(() => {
-    const game = getGameSession();
-    return game?.score ?? 0;
-  });
+  const totalScore = assemblyScore + debugScore + timeBonus;
+
+  const timerRef = useRef(null);
 
   useEffect(() => {
     initProgress();
@@ -38,13 +37,6 @@ export default function Question_1() {
     }
   }, []);
 
-  useEffect(() => {
-    const game = JSON.parse(sessionStorage.getItem("gameSession")) || {};
-    if (game.score !== undefined && game.score !== score) {
-      setScore(game.score);
-    }
-  }, [phase]);
-
   const EASY_TOPICS = [
     "Star Pattern",
     "Even / Odd",
@@ -53,23 +45,37 @@ export default function Question_1() {
     "Largest Of 3 Numbers"
   ];
 
-  const saveQuestionScore = (questionNo, score, timeTaken) => {
-    const results = JSON.parse(localStorage.getItem("bbbResults")) || {};
-    results[`Q${questionNo}`] = {
-      score,
+  const finishQuestion = (finalScore = totalScore) => {
+    const timeTaken = 600 - currentTimeLeft;
+
+    const resultData = {
+      score: finalScore,
       timeTaken,
-      completedAt: Date.now(),
     };
-    localStorage.setItem("bbbResults", JSON.stringify(results));
+
+    const language =
+  playerProfile?.language?.toLowerCase() || "c";
+
+
+    const allResults =
+      JSON.parse(sessionStorage.getItem("bbbResults")) || {};
+
+    if (!allResults[language]) {
+      allResults[language] = {};
+    }
+
+    allResults[language]["Q1"] = resultData;
+
+    sessionStorage.setItem("bbbResults", JSON.stringify(allResults));
+
+    completeQuestion(1);
+    navigate("/c/question-2");
   };
 
   useEffect(() => {
-    const existing = sessionStorage.getItem("gameSession");
-    if (!existing) {
-      sessionStorage.setItem(
-        "gameSession",
-        JSON.stringify({ score: 0, currentQuestion: 1, language: "c" })
-      );
+    const profile = sessionStorage.getItem("playerProfile");
+    if (!profile) {
+      navigate("/", { replace: true });
     }
   }, []);
 
@@ -83,42 +89,13 @@ export default function Question_1() {
     setPhase("assembly");
   };
 
-  const updateScore = (delta) => {
-    setScore(prev => {
-      const updated = Math.max(prev + delta, 0);
-      const game = getGameSession() || {};
-      sessionStorage.setItem(
-        "gameSession",
-        JSON.stringify({ ...game, score: updated })
-      );
-      return updated;
-    });
-  };
-
-  const getTimeBonus = (elapsedTime) => {
-    if (elapsedTime <= 120) return 50;
-    if (elapsedTime <= 240) return 30;
-    return 10;
-  };
-
-  useEffect(() => {
-    const profile = sessionStorage.getItem("playerProfile");
-    if (!profile) {
-      navigate("/", { replace: true });
-    }
-  }, []);
-
   const unlockDebug = () => {
-    updateScore(50);
+    setAssemblyScore(50);
     setAssemblyCompleted(true);
   };
 
-  const handleDebugFail = () => {
-    updateScore(-10);
-  };
-
   const onTimeUp = () => {
-    saveQuestionScore(1, score, 0);
+    timerRef.current?.stop();
     setIsGameOver(true);
   };
 
@@ -134,8 +111,8 @@ export default function Question_1() {
   if (isLocked) {
     return (
       <div className="locked-screen">
-        <h2>🔒 Question 1 Completed</h2>
-        <p>You've already completed this question. Please proceed to the next one.</p>
+        <h2>Question 1 Completed</h2>
+        <p>You've already completed this question. <br></br> Please proceed to the next one.</p>
         <button
           className="next-question-btn"
           onClick={() => navigate("/c/question-2", { replace: true })}
@@ -161,7 +138,11 @@ export default function Question_1() {
         </div>
 
         {(phase === "assembly" || phase === "debug") && !isGameOver && (
-          <Timer onTimeUp={onTimeUp} />
+          <Timer
+            ref={timerRef}
+            onTimeUp={onTimeUp}
+            getTimeLeft={setCurrentTimeLeft}
+          />
         )}
       </div>
 
@@ -180,7 +161,7 @@ export default function Question_1() {
         <div className="player-hud">
           <span className="avatar">{avatarsMap(playerProfile.avatar)}</span>
           <span className="username">{playerProfile.username}</span>
-          <span className="score">⭐ {score}</span>
+          <span className="score">⭐ {totalScore}</span>
         </div>
       )}
 
@@ -237,20 +218,31 @@ export default function Question_1() {
           {phase === "debug" && selectedTopic && (
             <DebugSection
               topic={selectedTopic}
-              score={score}
-              onScoreChange={updateScore}
+              onScoreChange={setDebugScore}
               language="c"
-              onSuccess={() => {
-                const elapsedTime = 600;
-                const bonus = getTimeBonus(elapsedTime);
-                updateScore(bonus);
-                saveQuestionScore(1, score + bonus, elapsedTime);
-                completeQuestion(1);
-                navigate("/c/question-2");
+              onSuccess={(finalDebugScore) => {
+                timerRef.current?.stop();
+
+                let bonus = 0;
+
+                if (finalDebugScore === 100 && currentTimeLeft > 0) {
+                  bonus = 50;
+                  setTimeBonus(50);
+                }
+
+                const finalScore =
+                  Number(assemblyScore) +
+                  Number(finalDebugScore) +
+                  Number(bonus);
+
+                finishQuestion(finalScore);
               }}
               onGiveUp={() => {
-                completeQuestion(1);
-                navigate("/c/question-2");
+                const finalScore =
+                  Number(assemblyScore) +
+                  Number(debugScore || 0);
+
+                finishQuestion(finalScore);
               }}
             />
           )}
@@ -271,15 +263,12 @@ export default function Question_1() {
 
               <div className="final-score">
                 <span className="final-label">Current Score</span>
-                <span className="final-value">{score}</span>
+                <span className="final-value">{totalScore}</span>
               </div>
 
               <button
                 className="next-question-btn"
-                onClick={() => {
-                  completeQuestion(1);
-                  navigate("/c/question-2");
-                }}
+                onClick={() => finishQuestion()}
               >
                 Next Question
               </button>

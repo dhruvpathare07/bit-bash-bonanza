@@ -1,5 +1,5 @@
 "use client";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import TopicSwiper from "../../components/TopicSwiper";
 import CodeAssembler from "../../components/CodeAssembler";
 import TopicRevealCard from "../../components/TopicRevealCard";
@@ -15,8 +15,16 @@ export default function Question_2() {
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [isGameOver, setIsGameOver] = useState(false);
   const [assemblyCompleted, setAssemblyCompleted] = useState(false);
-  const [currentTimeLeft, setCurrentTime] = useState(600);
   const [isLocked, setIsLocked] = useState(false);
+
+  const [assemblyScore, setAssemblyScore] = useState(0);
+  const [debugScore, setDebugScore] = useState(0);
+  const [timeBonus, setTimeBonus] = useState(0);
+  const [currentTimeLeft, setCurrentTimeLeft] = useState(600);
+
+  const totalScore = assemblyScore + debugScore + timeBonus;
+
+  const timerRef = useRef(null);
 
   useEffect(() => {
     initProgress();
@@ -41,23 +49,6 @@ export default function Question_2() {
 
   const navigate = useNavigate();
 
-  const saveQuestionScore = (questionNo, score, elapsedTime) => {
-    const results = JSON.parse(localStorage.getItem("bbbResults")) || {};
-    results[`Q${questionNo}`] = {
-      score,
-      timeTaken: elapsedTime,
-      completedAt: Date.now(),
-    };
-    localStorage.setItem("bbbResults", JSON.stringify(results));
-  };
-
-  useEffect(() => {
-    const game = JSON.parse(sessionStorage.getItem("gameSession")) || {};
-    if (game.score !== undefined) {
-      setScore(game.score);
-    }
-  }, []);
-
   useEffect(() => {
     const game = JSON.parse(sessionStorage.getItem("gameSession")) || {};
     sessionStorage.setItem(
@@ -66,38 +57,38 @@ export default function Question_2() {
     );
   }, []);
 
-  const getGameSession = () =>
-    JSON.parse(sessionStorage.getItem("gameSession"));
-
-  const [score, setScore] = useState(() => {
-    const game = getGameSession();
-    return game?.score ?? 0;
-  });
-
-  const updateScore = (delta) => {
-    setScore(prev => {
-      const updated = Math.max(prev + delta, 0);
-      const game = getGameSession() || {};
-      sessionStorage.setItem(
-        "gameSession",
-        JSON.stringify({ ...game, score: updated })
-      );
-      return updated;
-    });
-  };
-
-  const getTimeBonus = (elapsedTime) => {
-    if (elapsedTime <= 120) return 50;
-    if (elapsedTime <= 240) return 30;
-    return 10;
-  };
-
   useEffect(() => {
     const profile = sessionStorage.getItem("playerProfile");
     if (!profile) {
       navigate("/", { replace: true });
     }
   }, []);
+
+  const finishQuestion = (finalScore = totalScore) => {
+    const timeTaken = Math.max(600 - currentTimeLeft, 0);
+
+    const resultData = {
+      score: finalScore,
+      timeTaken,
+    };
+
+    const language =
+  playerProfile?.language?.toLowerCase() || "c";
+
+    const allResults =
+      JSON.parse(sessionStorage.getItem("bbbResults")) || {};
+
+    if (!allResults[language]) {
+      allResults[language] = {};
+    }
+
+    allResults[language]["Q2"] = resultData;
+
+    sessionStorage.setItem("bbbResults", JSON.stringify(allResults));
+
+    completeQuestion(2);
+    navigate("/c/question-3");
+  };
 
   const handleTopicSelect = (topic) => {
     setSelectedTopic(topic);
@@ -110,26 +101,20 @@ export default function Question_2() {
   };
 
   const unlockDebug = () => {
-    updateScore(75);
+    setAssemblyScore(75);
     setAssemblyCompleted(true);
   };
 
-  const handleDebugFail = () => {
-    updateScore(-10);
-  };
-
   const onTimeUp = () => {
-    const elapsedTime = 600 - currentTimeLeft;
-    saveQuestionScore(2, score, elapsedTime);
-    completeQuestion(2);
+    timerRef.current?.stop();
     setIsGameOver(true);
   };
 
   if (isLocked) {
     return (
       <div className="locked-screen">
-        <h2>🔒 Question 2 Completed</h2>
-        <p>You've already completed this question. Please proceed to the next one.</p>
+        <h2>Question 2 Completed</h2>
+        <p>You've already completed this question. <br></br> Please proceed to the next one.</p>
         <button
           className="next-question-btn"
           onClick={() => navigate("/c/question-3", { replace: true })}
@@ -155,8 +140,10 @@ export default function Question_2() {
         </div>
 
         {(phase === "assembly" || phase === "debug") && !isGameOver && (
-          <Timer onTimeUp={onTimeUp} 
-            getTimeLeft={(timeLeft) => setCurrentTime(timeLeft)}
+          <Timer
+            ref={timerRef}
+            onTimeUp={onTimeUp}
+            getTimeLeft={setCurrentTimeLeft}
           />
         )}
       </div>
@@ -176,7 +163,7 @@ export default function Question_2() {
         <div className="player-hud">
           <span className="avatar">{avatarsMap(playerProfile.avatar)}</span>
           <span className="username">{playerProfile.username}</span>
-          <span className="score">⭐ {score}</span>
+          <span className="score">⭐ {totalScore}</span>
         </div>
       )}
 
@@ -229,22 +216,31 @@ export default function Question_2() {
           {phase === "debug" && (
             <DebugSection
               topic={selectedTopic}
-              score={score}
-              onScoreChange={updateScore}
+              onScoreChange={setDebugScore}
               language="c"
-              onSuccess={() => {
-                const elapsedTime = 600 - currentTimeLeft;
-                const bonus = getTimeBonus(elapsedTime);
-                updateScore(bonus);
-                saveQuestionScore(2, score + bonus, elapsedTime);
-                completeQuestion(2);
-                navigate("/c/question-3");
+              onSuccess={(finalDebugScore) => {
+                timerRef.current?.stop();
+
+                let bonus = 0;
+
+                if (finalDebugScore === 100 && currentTimeLeft > 0) {
+                  bonus = 50;
+                  setTimeBonus(50);
+                }
+
+                const finalScore =
+                  Number(assemblyScore) +
+                  Number(finalDebugScore) +
+                  Number(bonus);
+
+                finishQuestion(finalScore);
               }}
               onGiveUp={() => {
-                const elapsedTime = 600 - currentTimeLeft;
-                saveQuestionScore(2, score, elapsedTime);
-                completeQuestion(2);
-                navigate("/c/question-3");
+                const finalScore =
+                  Number(assemblyScore) +
+                  Number(debugScore || 0);
+
+                finishQuestion(finalScore);
               }}
             />
           )}
@@ -265,12 +261,12 @@ export default function Question_2() {
 
               <div className="final-score">
                 <span className="final-label">Current Score</span>
-                <span className="final-value">{score}</span>
+                <span className="final-value">{totalScore}</span>
               </div>
 
               <button
                 className="next-question-btn"
-                onClick={() => navigate("/c/question-3", { replace: true })}
+                onClick={() => finishQuestion()}
               >
                 Next Question
               </button>

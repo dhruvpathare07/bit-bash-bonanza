@@ -1,4 +1,5 @@
 export const C_CORRECT_CODE = {
+  /* =========== EASY =========== */
   "Star Pattern": `#include <stdio.h>
 int main() {
 int n;
@@ -62,6 +63,8 @@ printf("%d is the largest number.", num2);}
 else {
 printf("%d is the largest number.", num3);}
 return 0;}`,
+
+  /* =========== MEDIUM =========== */
 
   "Armstrong": `#include <stdio.h>
 #include <math.h>
@@ -140,6 +143,8 @@ sum += arr[i];
 printf("Sum of array elements: %d\\n", sum);
 return 0;
 }`,
+
+  /* =========== HARD =========== */
 
   "String Reverse": `#include <stdio.h>
 #include <string.h>

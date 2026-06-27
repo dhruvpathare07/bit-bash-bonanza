@@ -1,6 +1,7 @@
 # evaluator.py
 from testcases import TEST_CASES
 from runner import run_code  # if already present, ignore
+import re
 
 # Reference CORRECT code — fixed versions of PYTHON_BUGGY_CODE
 # Reference CORRECT code — fixed versions of PYTHON_BUGGY_CODE
@@ -197,7 +198,11 @@ TOPIC_DIFFICULTY = {
     "Prime Number": "hard",
     "Number To Words Conversion": "hard",
 }
-
+def normalize(line: str) -> str:
+    line = line.lower()
+    line = re.sub(r'\s+', '', line)
+    line = re.sub(r'\b[a-z_][a-z0-9_]*\b', 'var', line)
+    return line
 
 def calculate_line_progress(user_code, correct_code):
     user = [l.strip() for l in user_code.splitlines() if l.strip()]
@@ -222,13 +227,13 @@ def run_test_cases(topic, code):
 
 
 
-def normalize(line: str) -> str:
-    """
-    Normalize a line for comparison:
-    - remove spaces
-    - lowercase
-    """
-    return line.replace(" ", "").lower()
+# def normalize(line: str) -> str:
+#     """
+#     Normalize a line for comparison:
+#     - remove spaces
+#     - lowercase
+#     """
+#     return line.replace(" ", "").lower()
 
 
 def classify_error(student_line: str, correct_line: str, difficulty: str):

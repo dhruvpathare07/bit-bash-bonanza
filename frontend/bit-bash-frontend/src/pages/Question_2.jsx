@@ -68,18 +68,18 @@ export default function Question_2() {
 
 
 
-  const saveQuestionScore = (questionNo, score, elapsedTime) => {
-  const results =
-    JSON.parse(localStorage.getItem("bbbResults")) || {};
+//   const saveQuestionScore = (questionNo, score, elapsedTime) => {
+//   const results =
+//     JSON.parse(localStorage.getItem("bbbResults")) || {};
 
-  results[`Q${questionNo}`] = {
-    score,
-    timeTaken: elapsedTime,
-    completedAt: Date.now(),
-  };
+//   results[`Q${questionNo}`] = {
+//     score,
+//     timeTaken: elapsedTime,
+//     completedAt: Date.now(),
+//   };
 
-  localStorage.setItem("bbbResults", JSON.stringify(results));
-};
+//   localStorage.setItem("bbbResults", JSON.stringify(results));
+// };
 
 // useEffect(() => {
 //   // Sync score whenever phase changes or page reloads
@@ -97,6 +97,7 @@ export default function Question_2() {
 // }, []);
 
 const finishQuestion = (finalScore = totalScore) => {
+    timerRef.current?.stop(); // add this
   const timeTaken = Math.max(600 - currentTimeLeft, 0);
 
   const resultData = {
@@ -104,12 +105,19 @@ const finishQuestion = (finalScore = totalScore) => {
     timeTaken,
   };
 
-  const allResults =
-    JSON.parse(localStorage.getItem("bbbResults")) || {};
+  const language = playerProfile.language?.toLowerCase() || "python";
 
-  allResults["Q2"] = resultData;
+const allResults =
+  JSON.parse(sessionStorage.getItem("bbbResults")) || {};
 
-  localStorage.setItem("bbbResults", JSON.stringify(allResults));
+if (!allResults[language]) {
+  allResults[language] = {};
+}
+
+allResults[language]["Q2"] = resultData;
+
+sessionStorage.setItem("bbbResults", JSON.stringify(allResults));
+
 
   completeQuestion(2);
   navigate("/python/question-3");
@@ -199,15 +207,21 @@ useEffect(() => {
     setIsGameOver(true);
   };*/
 
-  const onTimeUp = () => {
-  const elapsedTime = Math.max(600 - currentTimeLeft, 0);
+//   const onTimeUp = () => {
+//   const elapsedTime = Math.max(600 - currentTimeLeft, 0);
 
 
-  const finalScore = assemblyScore + debugScore + timeBonus;
-saveQuestionScore(2, finalScore, elapsedTime);
+//   const finalScore = assemblyScore + debugScore + timeBonus;
+// finishQuestion(finalScore);
 
-  completeQuestion(2); // 🔐 LOCK Q2
 
+//   completeQuestion(2); // 🔐 LOCK Q2
+
+//   setIsGameOver(true);
+// };
+
+const onTimeUp = () => {
+  timerRef.current?.stop();
   setIsGameOver(true);
 };
 
@@ -215,9 +229,9 @@ saveQuestionScore(2, finalScore, elapsedTime);
 if (isLocked) {
   return (
     <div className="locked-screen">
-      <h2>🔒 Question 2 Completed</h2>
+      <h2>Question 2 Completed</h2>
       <p>
-        You’ve already completed this question.
+        You’ve already completed this question. <br></br>
         Please proceed to the next one.
       </p>
 
@@ -342,10 +356,23 @@ if (isLocked) {
       setTimeBonus(50);
     }
 
-    const finalScore = assemblyScore + finalDebugScore + bonus;
+    const finalScore =
+  Number(assemblyScore) +
+  Number(finalDebugScore) +
+  Number(bonus);
+
     finishQuestion(finalScore);
   }}
-  onGiveUp={() => finishQuestion()}
+  onGiveUp={() => {
+    timerRef.current?.stop();
+
+    const finalScore =
+      Number(assemblyScore) +
+      Number(debugScore);
+
+    finishQuestion(finalScore);
+  }}
+
 />
 
           )}

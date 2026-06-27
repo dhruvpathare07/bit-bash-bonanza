@@ -13,11 +13,6 @@ import { initProgress, getProgress } from "../utils/progress";
 import { completeQuestion } from "../utils/progress";
 import { useRef } from "react";
 
-
-
-
-
-
 export default function Question_1() {
   // GAME STATE
   const [phase, setPhase] = useState("wheel"); // wheel | topic | assembly | debug
@@ -47,20 +42,28 @@ export default function Question_1() {
   // saveQuestionScore(1, totalScore, elapsed);
 
   const finishQuestion = (finalScore = totalScore) => {
+  timerRef.current?.stop(); // add this
   const timeTaken = 600 - currentTimeLeft;
 
   const resultData = {
     score: finalScore,
     timeTaken,
   };
+ 
 
+  const language = playerProfile.language?.toLowerCase() || "python";
 
-  const allResults =
-    JSON.parse(localStorage.getItem("bbbResults")) || {};
+const allResults =
+  JSON.parse(sessionStorage.getItem("bbbResults")) || {};
 
-  allResults["Q1"] = resultData;
+if (!allResults[language]) {
+  allResults[language] = {};
+}
 
-  localStorage.setItem("bbbResults", JSON.stringify(allResults));
+allResults[language]["Q1"] = resultData;
+
+sessionStorage.setItem("bbbResults", JSON.stringify(allResults));
+
 
   completeQuestion(1);
   navigate("/python/question-2");
@@ -251,9 +254,9 @@ const avatarsMap = (id) => {
 if (isLocked) {
   return (
     <div className="locked-screen">
-      <h2>🔒 Question 1 Completed</h2>
+      <h2>Question 1 Completed</h2>
       <p>
-        You’ve already completed this question.
+        You’ve already completed this question. <br></br>
         Please proceed to the next one.
       </p>
 
@@ -428,13 +431,27 @@ if (isLocked) {
     setTimeBonus(50);
   }
 
-  const finalScore = assemblyScore + finalDebugScore + bonus;
+  const finalScore =
+  Number(assemblyScore) +
+  Number(finalDebugScore) +
+  Number(bonus);
+
   finishQuestion(finalScore);
 }}
 
 
 
-  onGiveUp={finishQuestion}
+  onGiveUp={() => {
+    timerRef.current?.stop();
+
+    const finalScore =
+      Number(assemblyScore) +
+      Number(debugScore);
+
+    finishQuestion(finalScore);
+  }}
+
+
 />
 
 

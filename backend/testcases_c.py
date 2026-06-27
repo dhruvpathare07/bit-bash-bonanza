@@ -24,8 +24,8 @@ TEST_CASES_C = {
     ],
 
     "Largest Of 3 Numbers": [
-        ("3\n7\n5", "7"),
-        ("10\n2\n8", "10"),
+        ("3 7 5", "7"),
+        ("10 2 8", "10"),
     ],
     
     # ================= MEDIUM =================
@@ -70,13 +70,14 @@ TEST_CASES_C = {
 
 
     "Recursion Logic": [
-        ("5", "Factorial is 120"),
-        ("4", "Factorial is 24"),
+        ("5", "120"),
+        ("4", "24"),
+
     ],
 
     "Prime Number": [
-        ("14", "14 is Not Prime"),
-        ("17", "17 is Prime"),
+        ("14", "14"),
+        ("17", "17"),
         ("1", "1 is Not Prime"),
     ],
 

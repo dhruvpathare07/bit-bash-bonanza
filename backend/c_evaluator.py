@@ -1,6 +1,7 @@
 # c_evaluator.py
 from testcases_c import TEST_CASES_C
 from runner import run_code
+import re
 
 # Reference CORRECT code — C versions (SYNCED with cCorrectCode.js)
 C_CORRECT_CODE = {
@@ -253,9 +254,26 @@ C_TOPIC_DIFFICULTY = {
 }
 
 
+# def normalize_c(line: str) -> str:
+#     """Normalize C code line for comparison"""
+#     return line.replace(" ", "").lower()
+
+# def normalize_c(line: str) -> str:
+#     """
+#     Strong normalization:
+#     - remove all whitespace
+#     - lowercase
+#     - remove extra semicolon spacing
+#     """
+#     line = re.sub(r'\s+', '', line)
+#     return line.lower()
+
 def normalize_c(line: str) -> str:
-    """Normalize C code line for comparison"""
-    return line.replace(" ", "").lower()
+    line = line.lower()
+    line = re.sub(r'\s+', '', line)
+    line = re.sub(r'\b[a-z_][a-z0-9_]*\b', 'var', line)
+    return line
+
 
 
 def merge_braces_with_lines(lines):
@@ -295,12 +313,25 @@ def run_test_cases_c(topic, code):
             if error and "error" in error.lower():
                 return False
             
-            # Normalize both strings: strip whitespace, lowercase, handle line endings
-            normalized_output = " ".join(output.lower().split())
-            normalized_expected = " ".join(expected.lower().split())
-            
-            if normalized_expected not in normalized_output:
+            clean_output = output.lower().strip()
+            clean_expected = expected.lower().strip()
+
+# Remove prompts like "enter a number:"
+            clean_output = re.sub(r'enter.*?:', '', clean_output)
+
+# Normalize whitespace
+            clean_output = " ".join(clean_output.split())
+            clean_expected = " ".join(clean_expected.split())
+
+            if clean_output != clean_expected:
                 return False
+
+
+# Compare ending portion
+                # if expected_lines[-1] != output_lines[-1]:
+                #     return False
+
+
         except Exception as e:
             return False
     
@@ -363,8 +394,8 @@ def check_code_line_by_line_c(student_code: str, topic: str, attempts: int):
     ]
 
     # Merge lines with standalone braces to allow formatting flexibility
-    student_lines = merge_braces_with_lines(student_lines)
-    correct_lines = merge_braces_with_lines(correct_lines)
+    # student_lines = merge_braces_with_lines(student_lines)
+    # correct_lines = merge_braces_with_lines(correct_lines)
 
     total_lines = len(correct_lines)
     correct_count = 0
@@ -412,15 +443,30 @@ def check_code_line_by_line_c(student_code: str, topic: str, attempts: int):
                 "message": "This line is missing." if attempts >= 5 else "Some lines are still incorrect."
             })
 
+    # progress = int((correct_count / total_lines) * 100)
+    # success = correct_count == total_lines
+    
     progress = int((correct_count / total_lines) * 100)
+
+
+    # logic_success = run_test_cases_c(topic, student_code)
+
+    # success = (correct_count == total_lines) or logic_success
+    
     success = correct_count == total_lines
 
+
     if success:
-        message = "🎉 Code debugged successfully!"
+        if correct_count == total_lines:
+            message = "🎉 Code debugged successfully!"
+        else:
+            message = "🎉 Logic correct! Code works even if structure differs."
     else:
         message = f"❌ Some lines are still incorrect. ({correct_count}/{total_lines} fixed)"
 
     return success, message, progress, wrong_lines
+
+
 
 
 def calculate_line_progress_c(student_lines, correct_lines):

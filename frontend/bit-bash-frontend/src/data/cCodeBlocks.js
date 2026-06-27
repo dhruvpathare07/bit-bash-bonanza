@@ -7,12 +7,9 @@ export const C_CODE_BLOCKS = {
     "scanf(\"%d\", &n);",
     "for (int i = 1; i <= n; i++) {",
     "for (int j = 1; j <= i; j++) {",
-    "printf(\"* \");",
-    "}",
-    "printf(\"\\n\");",
-    "}",
-    "return 0;",
-    "}"
+    "printf(\"* \"); }",
+    "printf(\"\\n\"); }",
+    "return 0; }",
   ],
   "Even / Odd": [
     "#include <stdio.h>",
@@ -23,10 +20,8 @@ export const C_CODE_BLOCKS = {
     "if (num % 2 == 0) {",
     "printf(\"Even\\n\");",
     "} else {",
-    "printf(\"Odd\\n\");",
-    "}",
-    "return 0;",
-    "}"
+    "printf(\"Odd\\n\"); }",
+    "return 0; }",
   ],
   "Sum Of Digits": [
     "#include <stdio.h>",
@@ -36,11 +31,9 @@ export const C_CODE_BLOCKS = {
     "scanf(\"%d\", &num);",
     "while (num > 0) {",
     "sum += num % 10;",
-    "num /= 10;",
-    "}",
+    "num /= 10; }",
     "printf(\"Sum of digits:%d\\n\", sum);",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "Factorial": [
     "#include <stdio.h>",
@@ -49,11 +42,9 @@ export const C_CODE_BLOCKS = {
     "printf(\"Enter a number: \");",
     "scanf(\"%d\", &n);",
     "for (int i = 1; i <= n; i++) {",
-    "fact *= i;",
-    "}",
+    "fact *= i; }",
     "printf(\"%d\\n\", fact);",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "Largest Of 3 Numbers": [
     "#include <stdio.h>",
@@ -80,12 +71,10 @@ export const C_CODE_BLOCKS = {
     "while (temp > 0) {",
     "int digit = temp % 10;",
     "sum += digit * digit * digit;",
-    "temp /= 10;",
-    "}",
+    "temp /= 10; }",
     "if (sum == num) printf(\"%d is an Armstrong number\\n\", num);",
     "else printf(\"%d is not an Armstrong number\\n\", num);",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "Fibonacci": [
     "#include <stdio.h>",
@@ -98,10 +87,8 @@ export const C_CODE_BLOCKS = {
     "printf(\"%d \", b);",
     "int temp = a + b;",
     "a = b;",
-    "b = temp;",
-    "}",
-    "return 0;",
-    "}"
+    "b = temp; }",
+    "return 0; }",
   ],
   "Array Reverse": [
     "#include <stdio.h>",
@@ -109,14 +96,11 @@ export const C_CODE_BLOCKS = {
     "int arr[5];",
     "printf(\"Enter array elements: \");",
     "for (int i = 0; i < 5; i++) {",
-    "scanf(\"%d\", &arr[i]);",
-    "}",
+    "scanf(\"%d\", &arr[i]); }",
     "int n = 5;",
     "for (int i = n - 1; i >= 0; i--) {",
-    "printf(\"Reverse array: %d \", arr[i]);",
-    "}",
-    "return 0;",
-    "}"
+    "printf(\"Reverse array: %d \", arr[i]); }",
+    "return 0; }",
   ],
   "Palindrome": [
     "#include <stdio.h>",
@@ -133,8 +117,7 @@ export const C_CODE_BLOCKS = {
     "printf(\"%d is a palindrome\", num);",
     "else",
     "printf(\"%d is not a palindrome\", num);",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "Sum Of Array Elements": [
     "#include <stdio.h>",
@@ -142,15 +125,12 @@ export const C_CODE_BLOCKS = {
     "int arr[5];",
     "printf(\"Enter array elements: \");",
     "for (int i = 0; i < 5; i++) {",
-    "scanf(\"%d\", &arr[i]);",
-    "}",
+    "scanf(\"%d\", &arr[i]); }",
     "int n = 5, sum = 0;",
     "for (int i = 0; i < n; i++) {",
-    "sum += arr[i];",
-    "}",
+    "sum += arr[i]; }",
     "printf(\"Sum of array elements: %d\\n\", sum);",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "String Reverse": [
     "#include <stdio.h>",
@@ -161,10 +141,8 @@ export const C_CODE_BLOCKS = {
     "scanf(\"%s\", str);",
     "int n = strlen(str);",
     "for (int i = n - 1; i >= 0; i--) {",
-    "printf(\"%c\", str[i]);",
-    "}",
-    "return 0;",
-    "}"
+    "printf(\"%c\", str[i]); }",
+    "return 0; }",
   ],
   "Complex Pattern": [
     "#include <stdio.h>",
@@ -175,24 +153,20 @@ export const C_CODE_BLOCKS = {
     "for (int i = 1; i <= n; i++) {",
     "for (int j = 1; j <= n - i; j++) printf(\" \");",
     "for (int j = 1; j <= 2 * i - 1; j++) printf(\"*\");",
-    "printf(\"\n\");",
-    "}",
-    "return 0;",
-    "}"
+    "printf(\"\n\"); }",
+    "return 0; }",
   ],
   "Recursion Logic": [
     "#include <stdio.h>",
     "int factorial(int n) {",
     "if (n <= 1) return 1;",
-    "return n * factorial(n - 1);",
-    "}",
+    "return n * factorial(n - 1); }",
     "int main() {",
     "int num;",
     "printf(\"Enter a number: \");",
     "scanf(\"%d\", &num);",
     "printf(\"Factorial is %d\\n\", factorial(num));",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "Prime Number": [
     "#include <stdio.h>",
@@ -204,13 +178,10 @@ export const C_CODE_BLOCKS = {
     "for (int i = 2; i <= num / 2; i++) {",
     "if (num % i == 0) {",
     "isPrime = 0;",
-    "break;",
-    "}",
-    "}",
+    "break; } }",
     "if (isPrime) printf(\"%d is Prime\\n\", num);",
     "else printf(\"%d is Not Prime\\n\", num);",
-    "return 0;",
-    "}"
+    "return 0; }",
   ],
   "Number To Words Conversion": [
     "#include <stdio.h>",
@@ -226,8 +197,7 @@ export const C_CODE_BLOCKS = {
     "printf(\"%s\", teens[num - 11]);}",
     "else {",
     "printf(\"%s \", tens[num / 10]);",
-    "printf(\"%s\", ones[num % 10]);}",
-    "}",
+    "printf(\"%s\", ones[num % 10]);} }",
     "return 0;}",
   ]
 };

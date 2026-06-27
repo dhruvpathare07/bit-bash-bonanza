@@ -520,7 +520,7 @@
 }
 
 .avatar {
-  font-size: 50px;
+  font-size: 40px;
   animation: avatarPulse 6s ease-in-out infinite;
 }
 
@@ -555,5 +555,177 @@
 .final-round {
   border: 1px solid gold;
   box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+}
+
+/* ========== LOCKED SCREEN STYLES ========== */
+.locked-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 32px;
+  min-height: 100vh;
+  background: linear-gradient(180deg, var(--bg-main) 0%, #070a12 100%);
+  z-index: 2000;
+  overflow: hidden;
+}
+
+.locked-screen::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(124, 92, 255, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(124, 92, 255, 0.03) 1px, transparent 1px);
+  background-size: 60px 60px;
+  pointer-events: none;
+}
+
+.locked-screen::after {
+  content: '';
+  position: absolute;
+  width: 800px;
+  height: 800px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(124, 92, 255, 0.15), transparent 70%);
+  filter: blur(100px);
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.locked-screen h2 {
+  position: relative;
+  z-index: 10;
+  font-size: 72px;
+  font-weight: 900;
+  color: #fff;
+  margin: 0;
+  text-align: center;
+  letter-spacing: 2px;
+  text-shadow: 
+    0 0 30px rgba(124, 92, 255, 0.6),
+    0 0 60px rgba(124, 92, 255, 0.4),
+    0 0 90px rgba(124, 92, 255, 0.2),
+    0 8px 0 rgba(0, 0, 0, 0.4);
+  animation: completedTitleGlow 3s ease-in-out infinite;
+  line-height: 1.2;
+}
+
+@keyframes completedTitleGlow {
+  0%, 100% {
+    text-shadow: 
+      0 0 30px rgba(124, 92, 255, 0.6),
+      0 0 60px rgba(124, 92, 255, 0.4),
+      0 0 90px rgba(124, 92, 255, 0.2),
+      0 8px 0 rgba(0, 0, 0, 0.4);
+    transform: scale(1);
+  }
+  50% {
+    text-shadow: 
+      0 0 40px rgba(124, 92, 255, 0.8),
+      0 0 80px rgba(124, 92, 255, 0.6),
+      0 0 120px rgba(124, 92, 255, 0.4),
+      0 8px 0 rgba(0, 0, 0, 0.4);
+    transform: scale(1.02);
+  }
+}
+
+.locked-screen p {
+  position: relative;
+  z-index: 10;
+  font-size: 24px;
+  color: rgba(255, 255, 255, 0.8);
+  text-align: center;
+  margin: 0;
+  max-width: 600px;
+  line-height: 1.6;
+  font-weight: 400;
+  letter-spacing: 0.5px;
+  animation: messageSlideIn 0.8s ease-out 0.3s both;
+}
+
+@keyframes messageSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.next-question-btn {
+  position: relative;
+  z-index: 10;
+  padding: 18px 50px;
+  font-size: 18px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  color: #0b0f1a;
+  background: linear-gradient(135deg, var(--accent-pink), #ff1493, var(--accent-pink));
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+  box-shadow: 
+    0 0 30px rgba(255, 78, 205, 0.6),
+    0 0 60px rgba(255, 78, 205, 0.3),
+    0 8px 25px rgba(0, 0, 0, 0.4),
+    0 4px 0 rgba(0, 0, 0, 0.2);
+  animation: buttonBounce 2s ease-in-out infinite 0.5s;
+}
+
+@keyframes buttonBounce {
+  0%, 100% {
+    transform: translateY(0) scale(1);
+  }
+  50% {
+    transform: translateY(-6px) scale(1.05);
+  }
+}
+
+.next-question-btn:hover {
+  background: linear-gradient(135deg, #ff1493, var(--accent-pink), #ff1493);
+  transform: translateY(-8px) scale(1.08) !important;
+  box-shadow: 
+    0 0 40px rgba(255, 78, 205, 0.8),
+    0 0 80px rgba(255, 78, 205, 0.5),
+    0 15px 40px rgba(0, 0, 0, 0.5),
+    0 6px 0 rgba(0, 0, 0, 0.3);
+  filter: brightness(1.2);
+}
+
+.next-question-btn:active {
+  transform: translateY(-2px) scale(0.98);
+  box-shadow: 
+    0 0 20px rgba(255, 78, 205, 0.4),
+    0 0 40px rgba(255, 78, 205, 0.2),
+    0 4px 10px rgba(0, 0, 0, 0.3),
+    0 2px 0 rgba(0, 0, 0, 0.1);
+}
+
+/* Pulse animation for lock icon in heading */
+.locked-screen h2::before {
+  content: '🔒';
+  display: inline-block;
+  margin-right: 20px;
+  animation: lockPulse 2s ease-in-out infinite;
+}
+
+@keyframes lockPulse {
+  0%, 100% {
+    transform: scale(1) rotate(0deg);
+    filter: drop-shadow(0 0 0px rgba(255, 78, 205, 0));
+  }
+  50% {
+    transform: scale(1.15) rotate(-5deg);
+    filter: drop-shadow(0 0 20px rgba(255, 78, 205, 0.8));
+  }
 }
 
