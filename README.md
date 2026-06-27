@@ -4,6 +4,11 @@
 Bit Bash Bonanza is an interactive coding game designed to test and improve programming, debugging, and logical thinking skills in a fun and competitive way.
 
 ---
+## 🌟 Images
+<img width="1903" height="901" alt="home" src="https://github.com/user-attachments/assets/d61f7562-1863-4a82-b62c-5d7d2cb3106d" />
+<img width="1911" height="934" alt="Screenshot 2026-06-27 225608" src="https://github.com/user-attachments/assets/bf44767f-c083-4adb-b454-9364d94c1a60" />
+
+
 
 ## 🌟 Features
 
